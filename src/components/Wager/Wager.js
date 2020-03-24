@@ -29,7 +29,7 @@ const wager = (props) =>{
                     <Col>
                 <Form.Group controlId="bet_type">
                     <Form.Label>Odds: </Form.Label>
-                    <Form.Control type="number" onChange={(e)=>props.updateWager('odds', e.target.value)} value={props.odds}></Form.Control>
+                    <Form.Control type="number" placeholder="Ex) -110" onChange={(e)=>props.updateWager('odds', e.target.value)} value={props.odds}></Form.Control>
                 </Form.Group>
                 </Col>
                 <Col>

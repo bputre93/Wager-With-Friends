@@ -12,7 +12,8 @@ const wagerTable = (props)=> {
         data={props.data}
         options={props.options}
         className="wager-table"
-        layout="fitColumns"/>
+        layout="fitColumns"
+        />
     )
 }
 
