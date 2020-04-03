@@ -11,7 +11,7 @@ const wager = (props) =>{
                     <Col>
                 <Form.Group controlId="bettor1">
                     <Form.Label>Bettor:</Form.Label>
-                    <Form.Control type="textarea" rows="1" onChange={(e)=>props.updateWager('person1',e.target.value)} value={props.person1}></Form.Control>
+                    <Form.Control required type="textarea" rows="1" onChange={(e)=>props.updateWager('person1',e.target.value)} value={props.person1}></Form.Control>
                 </Form.Group>
                 </Col>
                 <Col>

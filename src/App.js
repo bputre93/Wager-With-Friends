@@ -14,7 +14,8 @@ class App extends Component {
       person2: '',
       description: '',
       amount: 0,
-      odds: null
+      odds: 0,
+      person2WinPotential: 0
     },
     existingWagers: [],
     updatedWager: {
@@ -27,12 +28,13 @@ class App extends Component {
 
   columns = [
     {title: "Date", field: "date", width: 125, align: "left"},
-    {title: "Bettor", field: "person1", width: 125, align: "left"},
-    {title: "Against", field: "person2", width: 125, align: "left"},
+    {title: "Bettor", field: "person1", width: 100, align: "left"},
+    {title: "Against", field: "person2", width: 100, align: "left"},
     {title: "Description", field: "description", align: "left", formatter:"textarea"},
     {title: "Amount", field: "amount", width: 100, align: "center", formatter: "money", formatterParams: {precision: false, symbol: "$"}},
     {title: "Odds", field:"odds", width: 75, align: "center"},
-    {title: "Completed?", field: "status", width: 125, align: "center",formatter:"tickCross", tooltip:"Click to complete a wager and enter a result", editor: true, cellEdited:(cell)=>{this.statusUpdated(cell)}},
+    {title: "To Win", field:"person2WinPotential", width: 100, align:"center", formatter: "money", formatterParams: {precision: false, symbol: "$"}},
+    {title: "Completed?", field: "status", width: 75, align: "center",formatter:"tickCross", tooltip:"Click to complete a wager and enter a result", editor: true, cellEdited:(cell)=>{this.statusUpdated(cell)}},
     {title: "Result", field: "result", align: "left", formatter: "textarea"}
 
   ]
@@ -51,7 +53,8 @@ class App extends Component {
           amount: wagers[wager].amount,
           odds: wagers[wager].odds,
           status: wagers[wager].status,
-          result: wagers[wager].result
+          result: wagers[wager].result,
+          person2WinPotential: wagers[wager].person2WinPotential
         }
         );
       }
@@ -72,19 +75,27 @@ class App extends Component {
     const date = new Date().toDateString();
     wager.date = date;
     wager.status = false;
-    console.log(wager)
-    fire.database().ref('wagers').push(wager);
-    this.setState({wager:{
-      person1: '',
-      person2: '',
-      description: '',
-      amount: 0,
-      odds: null
-    }})
+    if (wager.person1 !== '' && wager.person2 !== '' && wager.description !== '' && wager.amount !== 0 && wager.odds !== 0){
+      const winAmount = this.calculateWinnings();
+      wager.person2WinPotential = winAmount;
+      fire.database().ref('wagers').push(wager);
+      this.setState({wager:{
+        person1: '',
+        person2: '',
+        description: '',
+        amount: 0,
+        odds: 0,
+        person2WinPotential: 0
+      }})
+    }
+    else {
+      console.log('invalid form')
+    }
   }
 
   statusUpdated = (cell) =>{
     const data = cell.getData();
+    console.log(data)
     this.setState({updatedWager: data});
     fire.database().ref('wagers').child(data.id).update({status: data.status});
     if (data.status){
@@ -97,8 +108,23 @@ class App extends Component {
     this.setState({showResultsModal: false})
   }
 
-  
-
+  calculateWinnings = () =>{
+    const wager = {...this.state.wager};
+    const odds = Number(wager.odds);
+    const amount = Number(wager.amount);
+    
+    if (odds > 100){
+      var winAmount = (odds/100*amount).toFixed(2);
+    }
+    else if (odds < -100){
+      winAmount = (Math.abs((100/odds)*amount)).toFixed(2);
+    }
+    else if (-100 < odds < 100){
+      winAmount = 0;;
+      console.log("Odds must be >100 or <-100")
+    }
+    return winAmount;
+  }  
 
   render(){
 

@@ -12,7 +12,12 @@ class ResultsModal extends Component{
     handleSave = () =>{
         const wager = {...this.props.wager}
         console.log(wager);
-        fire.database().ref('wagers').child(wager.id).update({result: `${this.state.winner} wins $${wager.amount}`});
+        if (this.state.winner === wager.person1){
+            fire.database().ref('wagers').child(wager.id).update({result: `${this.state.winner} wins $${wager.amount}`});
+        }
+        else if (this.state.winner === wager.person2){
+            fire.database().ref('wagers').child(wager.id).update({result: `${this.state.winner} wins $${wager.person2WinPotential}`});
+        }
         this.props.handleClose();
     }
 
